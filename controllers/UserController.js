@@ -18,7 +18,7 @@ const register = async (req, res) => {
 
     // Check if user exists
     const user = await User.findOne({ email })
- 
+
     if (user) {
         res.status(422).json({ errors: ["Este e-mail já está sendo utilizado."] })
         return
@@ -45,8 +45,43 @@ const register = async (req, res) => {
         _id: newUser._id,
         token: generateToken(newUser._id),
     })
-} 
+}
+
+// Sign user in
+const login = async (req, res) => {
+    const { email, password } = req.body
+
+    const user = await User.findOne({ email })
+
+    // Check if user exists
+    if (!user) {
+        res.status(404).json({ errors: ["Credenciais inválidas."] })
+        return
+    }
+
+    // Check if password matches
+    if (!(await bcrypt.compare(password, user.password))) {
+        res.status(422).json({ errors: ["Credenciais inválidas."] })
+        return
+    }
+
+    // Return user with Token
+    res.status(201).json({
+        _id: user._id,
+        profileImage: user.profileImage,
+        token: generateToken(user._id),
+    })
+}
+
+// Get current logged in user
+const getCurrentUser = async (req, res) => {
+    const user = req.user
+
+    res.status(200).json(user)
+}
 
 module.exports = {
     register,
+    login,
+    getCurrentUser,
 }
