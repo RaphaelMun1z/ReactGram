@@ -17,9 +17,10 @@ const insertPhoto = async (req, res) => {
         title,
         userId: user._id,
         userName: user.name,
+        userProfileImage: user.profileImage,
     })
 
-    // If user was created successfully, return data
+    // If photo was created successfully, return data
     if (!newPhoto) {
         res.status(422).json({
             errors: ["Ocorreu um erro, por favor tente mais tarde."],
