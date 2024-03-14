@@ -139,10 +139,78 @@ const getUserById = async (req, res) => {
     }
 }
 
+// Follow somebody
+const follow = async (req, res) => {
+    const { followedUserId } = req.body
+
+    const reqUser = req.user
+    const userToFollow = await User.findById(new mongoose.Types.ObjectId(followedUserId))
+
+    // Check if user to follow is not the auth user
+    if (reqUser.id === followedUserId) {
+        res.status(402).json({ errors: ["Você não pode se seguir."] })
+        return
+    }
+
+    // Check if user to follow exists
+    if (!userToFollow) {
+        res.status(404).json({ errors: ["Usuário não encontrado."] })
+        return
+    }
+
+    // Check if auth user already follow the user to follow
+    if (reqUser.following.includes(userToFollow._id)) {
+        res.status(402).json({ errors: ["Você já segue esse usuário."] })
+        return
+    }
+
+    reqUser.following.push(followedUserId)
+    userToFollow.followers.push(reqUser.id)
+
+    await reqUser.save()
+    await userToFollow.save()
+
+    res.status(200).json({ authUser: reqUser, followedUser: userToFollow, message: "Usuário seguido com sucesso." })
+}
+
+// Unfollow somebody
+const unfollow = async (req, res) => {
+    const { unfollowedUserId } = req.body
+
+    const reqUser = req.user
+    const userToUnfollow = await User.findById(new mongoose.Types.ObjectId(unfollowedUserId))
+
+    // Check if user to unfollow exists
+    if (!userToUnfollow) {
+        res.status(404).json({ errors: ["Usuário não encontrado."] })
+        return
+    }
+
+    // Check if auth user already follow the user to unfollow
+    if (!reqUser.following.includes(unfollowedUserId)) {
+        res.status(402).json({ errors: ["Você não segue esse usuário."] })
+        return
+    }
+
+    // Find the user to unfollow index
+    const index = reqUser.following.indexOf(unfollowedUserId);
+    reqUser.following.splice(index, 1);
+
+    const indexUserFollowers = userToUnfollow.followers.indexOf(reqUser.id);
+    userToUnfollow.followers.splice(indexUserFollowers, 1);
+
+    await reqUser.save()
+    await userToUnfollow.save()
+
+    res.status(200).json({ authUser: reqUser, unfollowedUser: userToUnfollow, message: "Você deixou de seguir com sucesso." })
+}
+
 module.exports = {
     register,
     login,
     getCurrentUser,
     update,
     getUserById,
+    follow,
+    unfollow,
 }
