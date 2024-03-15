@@ -8,6 +8,7 @@ const userSchema = new Schema(
         password: String,
         profileImage: String,
         bio: String,
+        privateProfile: { type: Boolean, default: true },
         following: Array,
         followers: Array,
     },
