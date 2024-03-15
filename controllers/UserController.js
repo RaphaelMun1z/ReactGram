@@ -159,13 +159,19 @@ const follow = async (req, res) => {
     }
 
     // Check if auth user already follow the user to follow
-    if (reqUser.following.includes(userToFollow._id)) {
-        res.status(402).json({ errors: ["Você já segue esse usuário."] })
-        return
+    if (reqUser.following.some(followedUser => followedUser.id === followedUserId)) {
+        res.status(402).json({ errors: ["Você já segue esse usuário."] });
+        return;
     }
 
-    reqUser.following.push(followedUserId)
-    userToFollow.followers.push(reqUser.id)
+    reqUser.following.push({
+        id: followedUserId,
+        name: userToFollow.name,
+    })
+    userToFollow.followers.push({
+        id: reqUser.id,
+        name: reqUser.name,
+    })
 
     await reqUser.save()
     await userToFollow.save()
@@ -186,10 +192,9 @@ const unfollow = async (req, res) => {
         return
     }
 
-    // Check if auth user already follow the user to unfollow
-    if (!reqUser.following.includes(unfollowedUserId)) {
-        res.status(402).json({ errors: ["Você não segue esse usuário."] })
-        return
+    if (!reqUser.following.some(followedUser => followedUser.id === unfollowedUserId)) {
+        res.status(402).json({ errors: ["Você não segue esse usuário."] });
+        return;
     }
 
     // Find the user to unfollow index
