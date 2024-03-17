@@ -10,6 +10,7 @@ const userSchema = new Schema(
         bio: String,
         privateProfile: { type: Boolean, default: true },
         followSolicitation: Array,
+        notifications: Array,
         following: Array,
         followers: Array,
     },

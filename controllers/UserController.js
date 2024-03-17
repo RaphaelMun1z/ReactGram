@@ -70,6 +70,8 @@ const login = async (req, res) => {
     res.status(201).json({
         _id: user._id,
         profileImage: user.profileImage,
+        notifications: user.notifications,
+        followSolicitation: user.followSolicitation,
         token: generateToken(user._id),
     })
 }
@@ -139,6 +141,38 @@ const getUserById = async (req, res) => {
     }
 }
 
+// Solicite Follow Result
+const soliciteFollowResult = async (req, res) => {
+    const { ...responseData } = req.body
+
+    const reqUser = req.user
+    const userSolicitedFollow = await User.findById(new mongoose.Types.ObjectId(responseData.userSolicitedId))
+
+    // Check if user to follow exists
+    if (!userSolicitedFollow) {
+        res.status(404).json({ errors: ["Usuário não encontrado."] })
+        return
+    }
+
+    // Check if the user already solicited follow to the auth user
+    if (reqUser.followSolicitation.some(userAskToFollow => userAskToFollow.id !== responseData.userSolicitedId)) {
+        res.status(402).json({ errors: ["Esse usuário não pediu para seguir."] });
+        return;
+    }
+
+    if (responseData.statusUserResponse === true) {
+        return
+    } else {
+        // Find the user index to unsolicite 
+        const index = reqUser.followSolicitation.indexOf(userSolicitedFollow._id);
+        reqUser.followSolicitation.splice(index, 1);
+    }
+
+    await reqUser.save()
+
+    res.status(200).json({ authUser: reqUser, rejectedUser: userSolicitedFollow, message: "Você rejeitou o pedido para seguir." })
+}
+
 // Follow somebody
 const follow = async (req, res) => {
     const { followedUserId } = req.body
@@ -184,7 +218,46 @@ const follow = async (req, res) => {
     await reqUser.save()
     await userToFollow.save()
 
-    res.status(200).json({ authUser: reqUser, followedUser: userToFollow, message: "Usuário seguido com sucesso." })
+    if (userToFollow.privateProfile === true) {
+        res.status(200).json({ authUser: reqUser, followedUser: userToFollow, message: "Solicitação para seguir enviada com sucesso." })
+    } else {
+        res.status(200).json({ authUser: reqUser, followedUser: userToFollow, message: "Usuário seguido com sucesso." })
+    }
+}
+
+// Unsolicite Follow
+const unsoliciteFollow = async (req, res) => {
+    const { followedUserId } = req.body
+
+    const reqUser = req.user
+    const userToUnsoliciteFollow = await User.findById(new mongoose.Types.ObjectId(followedUserId))
+
+    // Check if user to unsolicite is not the auth user
+    if (reqUser.id === followedUserId) {
+        res.status(402).json({ errors: ["Você não pode se seguir."] })
+        return
+    }
+
+    // Check if user to follow exists
+    if (!userToUnsoliciteFollow) {
+        res.status(404).json({ errors: ["Usuário não encontrado."] })
+        return
+    }
+
+    // Check if auth user already follow the user to follow
+    if (userToUnsoliciteFollow.followSolicitation.some(userAskToFollow => userAskToFollow.id !== reqUser.id)) {
+        res.status(402).json({ errors: ["Você ainda não pediu para seguir esse usuário."] });
+        return;
+    }
+
+    // Find the user index to unsolicite 
+    const index = userToUnsoliciteFollow.followSolicitation.indexOf(reqUser.id);
+    userToUnsoliciteFollow.followSolicitation.splice(index, 1);
+
+    await reqUser.save()
+    await userToUnsoliciteFollow.save()
+
+    res.status(200).json({ authUser: reqUser, followedUser: userToUnsoliciteFollow, message: "Você retirou o pedido para seguir." })
 }
 
 // Unfollow somebody
@@ -233,7 +306,9 @@ module.exports = {
     getCurrentUser,
     update,
     getUserById,
+    soliciteFollowResult,
     follow,
+    unsoliciteFollow,
     unfollow,
     getUserByName,
 }

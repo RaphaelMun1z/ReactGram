@@ -11,6 +11,8 @@ const {
     follow,
     unfollow,
     getUserByName,
+    unsoliciteFollow,
+    soliciteFollowResult,
 } = require("../controllers/UserController")
 
 // Middlewares
@@ -31,6 +33,8 @@ router.get("/search", authGuard, getUserByName)
 router.put("/", authGuard, userUpdateValidation(), validate, imageUpload.single("profileImage"), update)
 router.get("/:id", getUserById)
 router.put("/follow", authGuard, follow)
+router.put("/followresponse", authGuard, soliciteFollowResult)
+router.put("/unsolicitefollow", authGuard, unsoliciteFollow)
 router.put("/unfollow", authGuard, unfollow)
 
 module.exports = router
