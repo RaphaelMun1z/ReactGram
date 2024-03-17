@@ -6,12 +6,13 @@ const {
     insertPhoto,
     deletePhoto,
     getAllPhotos,
+    getAllFollowingUsersPhotos,
     getUserPhotos,
     getPhotoById,
     updatePhoto,
     likePhoto,
     commentPhoto,
-    searchPhotos
+    searchPhotos,
 } = require("../controllers/PhotoController")
 
 // Middlewares
@@ -24,6 +25,7 @@ const { imageUpload } = require("../middlewares/imageUpload")
 router.post("/", authGuard, imageUpload.single("image"), photoInsertValidation(), validate, insertPhoto)
 router.delete("/:id", authGuard, deletePhoto)
 router.get("/", authGuard, getAllPhotos)
+router.get("/following", authGuard, getAllFollowingUsersPhotos)
 router.get("/user/:id", authGuard, getUserPhotos)
 router.get("/search", authGuard, searchPhotos)
 router.get("/:id", authGuard, getPhotoById)

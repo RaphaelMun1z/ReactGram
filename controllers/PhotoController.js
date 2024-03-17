@@ -69,6 +69,30 @@ const getAllPhotos = async (req, res) => {
     return res.status(200).json(photos)
 }
 
+// Get all following users photos
+const getAllFollowingUsersPhotos = async (req, res) => {
+    const reqUser = req.user
+
+    try {
+        const followingUserIds = reqUser.following.map(user => user.id);
+
+        const photosPromises = followingUserIds.map(userId => {
+            return Photo.find({ userId }).sort([["createdAt", -1]]);
+        });
+
+        const authUserPhotos = await Photo.find({ userId: reqUser._id }).sort([["createdAt", -1]]);
+
+        const photosArrays = await Promise.all([...photosPromises, authUserPhotos]);
+
+        const allPhotos = photosArrays.reduce((acc, photos) => acc.concat(photos), []);
+
+        return res.status(200).json(allPhotos);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ errors: ["Erro do Servidor Interno."] })
+    }
+}
+
 // Get user photos
 const getUserPhotos = async (req, res) => {
     const { id } = req.params
@@ -203,6 +227,7 @@ module.exports = {
     insertPhoto,
     deletePhoto,
     getAllPhotos,
+    getAllFollowingUsersPhotos,
     getUserPhotos,
     getPhotoById,
     updatePhoto,

@@ -164,14 +164,22 @@ const follow = async (req, res) => {
         return;
     }
 
-    reqUser.following.push({
-        id: followedUserId,
-        name: userToFollow.name,
-    })
-    userToFollow.followers.push({
-        id: reqUser.id,
-        name: reqUser.name,
-    })
+    if (userToFollow.privateProfile === true) {
+        userToFollow.followSolicitation.push({
+            id: reqUser.id,
+            name: reqUser.name,
+        })
+    } else {
+        userToFollow.followers.push({
+            id: reqUser.id,
+            name: reqUser.name,
+        })
+
+        reqUser.following.push({
+            id: followedUserId,
+            name: userToFollow.name,
+        })
+    }
 
     await reqUser.save()
     await userToFollow.save()
@@ -210,6 +218,15 @@ const unfollow = async (req, res) => {
     res.status(200).json({ authUser: reqUser, unfollowedUser: userToUnfollow, message: "Você deixou de seguir com sucesso." })
 }
 
+// Get user by name
+const getUserByName = async (req, res) => {
+    const { username } = req.query
+
+    const users = await User.find({ name: { $regex: username, $options: 'i' } }, { _id: 1, profileImage: 1, name: 1 }).limit(10).exec();
+
+    res.status(200).json(users)
+}
+
 module.exports = {
     register,
     login,
@@ -218,4 +235,5 @@ module.exports = {
     getUserById,
     follow,
     unfollow,
+    getUserByName,
 }
