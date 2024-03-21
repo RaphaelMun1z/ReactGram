@@ -146,6 +146,7 @@ const soliciteFollowResult = async (req, res) => {
     const { ...responseData } = req.body
 
     const reqUser = req.user
+
     const userSolicitedFollow = await User.findById(new mongoose.Types.ObjectId(responseData.userSolicitedId))
 
     // Check if user to follow exists
@@ -164,8 +165,14 @@ const soliciteFollowResult = async (req, res) => {
         return
     } else {
         // Find the user index to unsolicite 
-        const index = reqUser.followSolicitation.indexOf(userSolicitedFollow._id);
-        reqUser.followSolicitation.splice(index, 1);
+        const index = reqUser.followSolicitation.findIndex(obj => toString(obj.id) === toString(userSolicitedFollow._id));
+
+        if (index !== -1) {
+            reqUser.followSolicitation.splice(index, 1);
+        } else {
+            res.status(404).json({ errors: ["Esse usuário não pediu para seguir."] });
+            return;
+        }
     }
 
     await reqUser.save()
