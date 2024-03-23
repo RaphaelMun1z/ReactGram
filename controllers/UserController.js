@@ -161,23 +161,52 @@ const soliciteFollowResult = async (req, res) => {
         return;
     }
 
+    // Check if the user already follow the auth user
+    if (reqUser.followers.some(follower => follower.id === responseData.userSolicitedId)) {
+        res.status(402).json({ errors: ["Esse usuário já é um seguidor."] });
+        return;
+    }
+
     if (responseData.statusUserResponse === true) {
-        return
-    } else {
+        reqUser.followers.push({
+            id: userSolicitedFollow._id,
+            name: userSolicitedFollow.name,
+        })
+
+        userSolicitedFollow.following.push({
+            id: reqUser.id,
+            name: reqUser.name,
+        })
+
         // Find the user index to unsolicite 
         const index = reqUser.followSolicitation.findIndex(obj => toString(obj.id) === toString(userSolicitedFollow._id));
 
         if (index !== -1) {
             reqUser.followSolicitation.splice(index, 1);
         } else {
+            res.status(200).json({ authUser: reqUser, rejectedUser: userSolicitedFollow, message: "Houve um problema ao aceitar o pedido." })
+            return
+        }
+
+        await reqUser.save()
+        await userSolicitedFollow.save()
+
+        res.status(200).json({ authUser: reqUser, rejectedUser: userSolicitedFollow, message: "Você aceitou o pedido para seguir." })
+    } else {
+        // Find the user index to unsolicite 
+        const index = reqUser.followSolicitation.findIndex(obj => toString(obj.id) === toString(userSolicitedFollow._id));
+
+        if (index !== -1) {
+            reqUser.followSolicitation.splice(index, 1);
+
+            await reqUser.save()
+
+            res.status(200).json({ authUser: reqUser, rejectedUser: userSolicitedFollow, message: "Você rejeitou o pedido para seguir." })
+        } else {
             res.status(404).json({ errors: ["Esse usuário não pediu para seguir."] });
             return;
         }
     }
-
-    await reqUser.save()
-
-    res.status(200).json({ authUser: reqUser, rejectedUser: userSolicitedFollow, message: "Você rejeitou o pedido para seguir." })
 }
 
 // Follow somebody
