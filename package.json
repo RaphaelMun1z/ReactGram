@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "server": "nodemon ./app.js"
+    "server": "nodemon dist/app.js",
+    "": ""
   },
   "keywords": [],
   "author": "RaphaelMuniz <raphaelmunizvarela@gmail.com> (https://www.linkedin.com/in/raphael-muniz-7119911a2/)",
