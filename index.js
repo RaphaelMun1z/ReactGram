@@ -13,7 +13,8 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
 // Solve CORS
-app.use(cors({ credentials: true, origin: "https://react-gram-frontend.vercel.app" }))
+app.use(cors({ credentials: true, origin: ["https://react-gram-frontend.vercel.app", "https://react-gram-frontend-39ogwjqgf-raphael-munizs-projects.vercel.app"] }))
+
 
 // Upload directory
 app.use("/uploads", express.static(path.join(__dirname, "/uploads")))
