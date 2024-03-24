@@ -8,6 +8,22 @@ const createReport = async (req, res) => {
     const { reportedUserId, cause, message } = req.body
     const reqUser = req.user
 
+    if (cause.trim() === '') {
+        res.status(400).json({
+            errors: ["O campo CAUSA é obrigatório."],
+        })
+
+        return
+    }
+
+    if (message.trim() === '') {
+        res.status(400).json({
+            errors: ["O campo MENSAGEM é obrigatório."],
+        })
+
+        return
+    }
+
     const reportedUserVerify = await User.findById(reportedUserId)
 
     if (!reportedUserVerify) {
