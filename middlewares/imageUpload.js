@@ -12,10 +12,19 @@ const imageStorage = multer.diskStorage({
             folder = "photos"
         }
 
-        cb(null, `uploads/${folder}/`)
+        try {
+            cb(null, `uploads/${folder}/`)
+        } catch (error) {
+            return cb(new Error("Erro interno!"))
+        }
+
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname))
+        try {
+            cb(null, Date.now() + path.extname(file.originalname))
+        } catch (error) {
+            return cb(new Error("Erro interno!"))
+        }
     }
 })
 
@@ -27,7 +36,11 @@ const imageUpload = multer({
             return cb(new Error("Por favor, envie apenas png ou jpg!"))
         }
 
-        cb(undefined, true)
+        try {
+            cb(undefined, true)
+        } catch (error) {
+            return cb(new Error("Erro interno!"))
+        }
     }
 })
 
