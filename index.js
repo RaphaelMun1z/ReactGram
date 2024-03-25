@@ -18,10 +18,10 @@ app.use(cors({
     origin: [
         "https://react-gram-frontend.vercel.app",
         "https://react-gram-frontend-39ogwjqgf-raphael-munizs-projects.vercel.app",
-        "https://react-gram-frontend.vercel.app/login"
+        "https://react-gram-frontend.vercel.app/login",
+        "*",
     ]
 }))
-
 
 // Upload directory
 app.use("/uploads", express.static(path.join(__dirname, "/uploads")))
