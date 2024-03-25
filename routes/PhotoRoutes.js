@@ -22,7 +22,7 @@ const authGuard = require("../middlewares/authGuard")
 const { imageUpload } = require("../middlewares/imageUpload")
 
 // Routes
-router.post("/", authGuard,  insertPhoto)
+router.post("/", authGuard, imageUpload.single("image"), photoInsertValidation(), validate, insertPhoto)
 router.delete("/:id", authGuard, deletePhoto)
 router.get("/", authGuard, getAllPhotos)
 router.get("/following", authGuard, getAllFollowingUsersPhotos)
