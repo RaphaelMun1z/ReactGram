@@ -7,6 +7,10 @@ const mongoose = require("mongoose")
 const insertPhoto = async (req, res) => {
     console.log("Chegou no controller")
 
+    res.status(201).json({ errors: ["Chegou no controller"] })
+
+    return
+
     const { title } = req.body
     const image = req.file.filename
 
