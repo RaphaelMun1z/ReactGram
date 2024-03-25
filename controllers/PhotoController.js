@@ -5,8 +5,12 @@ const mongoose = require("mongoose")
 
 // Insert a photo, with an user related to it
 const insertPhoto = async (req, res) => {
+    console.log("Chegou no controller")
+
     const { title } = req.body
     const image = req.file.filename
+
+    console.log(image)
 
     const reqUser = req.user
     const user = await User.findById(reqUser._id)
