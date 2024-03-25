@@ -4,7 +4,6 @@ const path = require("path")
 // Destination to store image
 const imageStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        return cb(new Error("AAAAAAAAAAAAAAAAAAAAA!"))
         let folder = ""
 
         if (req.baseUrl.includes("users")) {
