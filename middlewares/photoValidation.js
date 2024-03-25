@@ -11,7 +11,7 @@ const photoInsertValidation = () => {
                 if (!req.file) {
                     throw new Error("A imagem é obrigatória.")
                 }else{
-                    throw new Error("Há uma imagem: " + req)
+                    throw new Error("Há uma imagem: ")
                 }
 
                 return true
