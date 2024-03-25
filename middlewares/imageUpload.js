@@ -1,8 +1,6 @@
 const multer = require("multer")
 const path = require("path")
 
-console.log("Passou pelo middleware do backend")
-
 // Destination to store image
 const imageStorage = multer.diskStorage({
     destination: (req, file, cb) => {

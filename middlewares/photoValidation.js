@@ -1,7 +1,6 @@
 const { body } = require("express-validator")
 
 const photoInsertValidation = () => {
-    console.log("Teste A")
     return [
         body("title")
             .not().equals("undefined").withMessage("O título é obrigatório.")
@@ -10,7 +9,6 @@ const photoInsertValidation = () => {
         body("image")
             .custom((value, { req }) => {
                 if (!req.file) {
-                    console.log("Teste B")
                     throw new Error("A imagem é obrigatória.")
                 }
 
