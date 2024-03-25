@@ -19,7 +19,6 @@ app.use(cors({
         "https://react-gram-frontend.vercel.app",
         "https://react-gram-frontend-39ogwjqgf-raphael-munizs-projects.vercel.app",
         "https://react-gram-frontend.vercel.app/login",
-        "*",
     ]
 }))
 
