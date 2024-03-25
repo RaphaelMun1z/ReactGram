@@ -13,7 +13,7 @@ const imageStorage = multer.diskStorage({
         }
 
         try {
-            cb(null, `uploads/${folder}/`)
+            cb(null, `https://react-gram-frontend.vercel.app/uploads/${folder}/`)
         } catch (error) {
             return cb(new Error("Erro interno!"))
         }
