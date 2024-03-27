@@ -16,7 +16,8 @@ app.use(express.urlencoded({ extended: false }))
 app.use(cors({
     credentials: true,
     origin: [
-        "http://localhost:5173",
+        "https://react-gram-frontend-orcin.vercel.app",
+        "https://react-gram-frontend-orcin.vercel.app/login",
     ]
 }))
 
